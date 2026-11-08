@@ -1,15 +1,43 @@
 import { useEffect, useState } from "react";
 import type { Item } from "./types/item";
+import ComparisonPanel from "./components/ComparisonPanel";
 import ItemList from "./components/ItemList";
 
 function App() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState<string>("");
   const [slot, setSlot] = useState<string>("");
   const [level, setLevel] = useState<number>(20);
   const [page, setPage] = useState<number>(1);
   const [lastPage, setLastPage] = useState<number>(1);
+  const [selectedItems, setSelectedItems] = useState<Item[]>([]);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+
+  const handleCompare = (item: Item) => {
+    setSelectedItems((current) => {
+      if (current.some((selected) => selected.id === item.id)) {
+        return current.filter((selected) => selected.id !== item.id);
+      }
+
+      if (current.length >= 2) {
+        return current;
+      }
+
+      return [...current, item];
+    });
+  };
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [search]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -21,6 +49,9 @@ function App() {
 
         if (slot) {
           params.set("slot", slot);
+        }
+        if (debouncedSearch) {
+          params.set("search", debouncedSearch);
         }
         params.set("level", level.toString());
         params.set("page", page.toString());
@@ -63,7 +94,7 @@ function App() {
     return () => {
       controller.abort();
     };
-  }, [slot, level, page]);
+  }, [debouncedSearch, slot, level, page]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -97,7 +128,27 @@ function App() {
             </span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <label
+                htmlFor="search"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Search equipment
+              </label>
+              <input
+                id="search"
+                type="search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(1);
+                }}
+                placeholder="e.g. Corrosive Daggers"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="slot"
@@ -154,6 +205,10 @@ function App() {
           </div>
         </section>
 
+        {selectedItems.length === 2 && (
+          <ComparisonPanel items={selectedItems} onRemove={handleCompare} />
+        )}
+
         {loading ? (
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[1, 2, 3, 4].map((skeleton) => (
@@ -176,7 +231,16 @@ function App() {
             </p>
           </div>
         ) : (
-          <ItemList items={items} />
+          <>
+            <p className="mt-8 text-sm font-semibold text-amber-400">
+              Selected for comparison: {selectedItems.length}/2
+            </p>
+            <ItemList
+              items={items}
+              selectedItems={selectedItems}
+              onCompare={handleCompare}
+            />
+          </>
         )}
 
         {!loading && !error && lastPage > 1 && (

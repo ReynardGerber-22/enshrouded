@@ -14,6 +14,7 @@ class ItemController extends Controller
         $filters = $request->validate([
             'slot' => ['sometimes', 'string', 'in:weapon,helmet,chest,legs,arms,boots,ring,shield'],
             'level' => ['sometimes', 'integer', 'between:1,50'],
+            'search' => ['sometimes', 'string', 'max:100'],
         ]);
         $query = Item::query()
             ->with('perks')
@@ -21,6 +22,10 @@ class ItemController extends Controller
 
         if (isset($filters['slot'])) {
             $query->where('equip_slot', $filters['slot']);
+        }
+
+        if (! empty($filters['search'])) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%');
         }
 
         if (isset($filters['level'])) {

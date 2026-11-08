@@ -2,9 +2,17 @@ import type { Item } from "../types/item";
 
 interface ItemCardProps {
   item: Item;
+  isSelected: boolean;
+  isSelectionFull: boolean;
+  onCompare: (item: Item) => void;
 }
 
-function ItemCard({ item }: ItemCardProps) {
+function ItemCard({
+  item,
+  isSelected,
+  isSelectionFull,
+  onCompare,
+}: ItemCardProps) {
   const rarityStyles: Record<string, { card: string; name: string; badge: string }> = {
     common: {
       card: "border-slate-700",
@@ -32,7 +40,9 @@ function ItemCard({ item }: ItemCardProps) {
 
   return (
     <li
-      className={`group rounded-2xl border-l-4 ${colors.card} border-y border-r bg-slate-900/80 p-5 shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-slate-900`}
+      className={`group rounded-2xl border-l-4 ${colors.card} border-y border-r bg-slate-900/80 p-5 shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-slate-900 ${
+        isSelected ? "ring-2 ring-amber-400/70" : ""
+      }`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -94,6 +104,19 @@ function ItemCard({ item }: ItemCardProps) {
           </ul>
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={() => onCompare(item)}
+        disabled={isSelectionFull && !isSelected}
+        className={`mt-5 w-full rounded-xl border px-3 py-2 text-sm font-semibold transition ${
+          isSelected
+            ? "border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20"
+            : "border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400/40 hover:text-white"
+        } disabled:cursor-not-allowed disabled:opacity-40`}
+      >
+        {isSelected ? "Remove from comparison" : "Compare"}
+      </button>
     </li>
   );
 }
