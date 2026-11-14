@@ -14,6 +14,7 @@ class ItemController extends Controller
         $filters = $request->validate([
             'slot' => ['sometimes', 'string', 'in:weapon,helmet,chest,legs,arms,boots,ring,shield'],
             'level' => ['sometimes', 'integer', 'between:1,50'],
+            'item_level' => ['sometimes', 'integer', 'between:1,50'],
             'search' => ['sometimes', 'string', 'max:100'],
         ]);
         $query = Item::query()

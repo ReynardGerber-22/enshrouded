@@ -68,10 +68,23 @@ function ItemCard({
         {item.damage_total !== null && (
           <div className="rounded-xl bg-orange-400/10 px-3 py-2">
             <p className="text-[11px] uppercase tracking-wider text-orange-300/70">
-              Damage
+              Imported damage
             </p>
             <p className="mt-1 font-semibold text-orange-300">
               {item.damage_total}
+            </p>
+          </div>
+        )}
+        {item.equip_slot === "weapon" && item.estimated_base_damage !== null && (
+          <div className="rounded-xl bg-amber-400/10 px-3 py-2">
+            <p className="text-[11px] uppercase tracking-wider text-amber-300/70">
+              Estimated base damage
+            </p>
+            <p className="mt-1 font-semibold text-amber-300">
+              {item.estimated_base_damage}
+            </p>
+            <p className="mt-1 text-[10px] leading-4 text-slate-400">
+              Estimate only; not final combat damage.
             </p>
           </div>
         )}

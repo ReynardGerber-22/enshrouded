@@ -16,6 +16,7 @@ class PerkResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'perk_id' => $this->perk_id,
             'name' => $this->name,
             'kind' => $this->kind,
             'description' => $this->description,

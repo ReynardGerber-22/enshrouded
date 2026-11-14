@@ -1,5 +1,6 @@
 export interface Perk {
   id: number;
+  perk_id: number;
   name: string | null;
   kind: string | null;
   description: string | null;
@@ -15,6 +16,7 @@ export interface Item {
   min_level: number | null;
   max_level: number | null;
   damage_total: string | null;
+  estimated_base_damage: number | null;
   armor_total: string | null;
   weapon_category_type: string | null;
   weapon_class_type: string | null;

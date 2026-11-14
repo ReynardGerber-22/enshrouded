@@ -227,7 +227,7 @@ function App() {
           <div className="mt-8 rounded-2xl border border-dashed border-slate-700 p-10 text-center">
             <p className="font-semibold text-white">No equipment found</p>
             <p className="mt-1 text-sm text-slate-500">
-              Try changing the slot or character level.
+              Try a different search term, equipment slot, or character level.
             </p>
           </div>
         ) : (
@@ -243,7 +243,7 @@ function App() {
           </>
         )}
 
-        {!loading && !error && lastPage > 1 && (
+        {!loading && !error && items.length > 0 && lastPage > 1 && (
           <nav
             aria-label="Equipment pages"
             className="mt-8 flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-3"

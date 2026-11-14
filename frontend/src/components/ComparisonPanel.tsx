@@ -6,13 +6,24 @@ interface ComparisonPanelProps {
 }
 
 function ComparisonPanel({ items, onRemove }: ComparisonPanelProps) {
+  const firstItem = items[0];
+  const secondItem = items[1];
+  const higherDamageEstimateItemId =
+    items.length === 2 &&
+    firstItem?.equip_slot === "weapon" &&
+    secondItem?.equip_slot === "weapon" &&
+    firstItem.estimated_base_damage !== null &&
+    secondItem.estimated_base_damage !== null &&
+    firstItem.estimated_base_damage !== secondItem.estimated_base_damage
+      ? firstItem.estimated_base_damage > secondItem.estimated_base_damage
+        ? firstItem.id
+        : secondItem.id
+      : null;
   const sharedPerks = new Set(
     items[0]?.perks
-      .map((perk) => perk.name ?? "Unknown perk")
-      .filter((name) =>
-        items[1]?.perks.some(
-          (perk) => (perk.name ?? "Unknown perk") === name,
-        ),
+      .map((perk) => perk.perk_id)
+      .filter((perkId) =>
+        items[1]?.perks.some((perk) => perk.perk_id === perkId),
       ),
   );
 
@@ -68,13 +79,39 @@ function ComparisonPanel({ items, onRemove }: ComparisonPanelProps) {
               {item.damage_total !== null && (
                 <div className="rounded-xl bg-orange-400/10 px-3 py-2">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-orange-300/70">
-                    Damage
+                    Imported damage
                   </p>
                   <p className="mt-1 text-xl font-bold text-orange-300">
                     {item.damage_total}
                   </p>
                 </div>
               )}
+              {item.equip_slot === "weapon" &&
+                item.estimated_base_damage !== null && (
+                  <div
+                    className={`rounded-xl px-3 py-2 ${
+                      item.id === higherDamageEstimateItemId
+                        ? "bg-emerald-400/10 ring-1 ring-emerald-400/40"
+                        : "bg-amber-400/10"
+                    }`}
+                  >
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-300/70">
+                      Estimated base damage
+                    </p>
+                    <p
+                      className={`mt-1 text-xl font-bold ${
+                        item.id === higherDamageEstimateItemId
+                          ? "text-emerald-300"
+                          : "text-amber-300"
+                      }`}
+                    >
+                      {item.estimated_base_damage}
+                    </p>
+                    <p className="mt-1 text-[10px] leading-4 text-slate-400">
+                      Estimate only; not final combat damage.
+                    </p>
+                  </div>
+                )}
               {item.armor_total !== null && (
                 <div className="rounded-xl bg-sky-400/10 px-3 py-2">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-sky-300/70">
@@ -95,7 +132,7 @@ function ComparisonPanel({ items, onRemove }: ComparisonPanelProps) {
                 <ul className="mt-2 flex flex-wrap gap-2">
                   {item.perks.map((perk, index) => {
                     const name = perk.name ?? "Unknown perk";
-                    const isShared = sharedPerks.has(name);
+                    const isShared = sharedPerks.has(perk.perk_id);
 
                     return (
                       <li
